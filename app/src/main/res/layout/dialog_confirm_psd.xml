@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ver="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical">
+
+    <com.runvision.g702_sn.VerificationCodeInput
+        android:id="@+id/verificationCodeInput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        ver:box="6"
+        ver:box_bg_normal="@drawable/verification_edit_bg_normal"
+        ver:box_bg_focus="@drawable/verification_edit_bg_focus"
+        ver:child_h_padding="8dp"
+        ver:child_width="60dp"
+        ver:child_height="60dp"
+        ver:inputType="number"/>
+
+</LinearLayout>
