@@ -65,8 +65,6 @@ import com.telpo.tps550.api.TelpoException;
 import com.telpo.tps550.api.idcard.IdCard;
 import com.telpo.tps550.api.idcard.IdentityInfo;
 import com.telpo.tps550.api.util.ShellUtils;
-import com.telpo.tps550.api.util.StringUtil;
-import com.telpo.tps550.api.util.SystemUtil;
 import com.zkteco.android.IDReader.IDPhotoHelper;
 import com.zkteco.android.IDReader.WLTService;
 import com.zkteco.android.biometric.core.device.ParameterHelper;
@@ -90,11 +88,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 
 public class MainActivity extends Activity implements NetWorkStateReceiver.INetStatusListener, View.OnClickListener {
