@@ -145,6 +145,16 @@ public class Const {
     public static final String KEY_EDITION = "edition";
     public static final String KEY_TELEPHONE_NUMBER = "telephonenumber";
 
+    public static String DEV_INSCODE = "inscode";
+    public static String PRIVATE_KEY = "privateKey";
+    public static String DEV_NUM = "devnum";
+    public static String DEV_GPS = "gps";
+    public static String SELECT_COURSE_NAME = "select_course_name";
+    public static String TIME_SIGN_BEGIN = "time_sign_begin";
+    public static String TIME_SIGN_END = "time_sign_end";
+    public static String TIME_SIGN_OUT_BEGIN = "time_sign_out_begin";
+    public static String TIME_SIGN_OUT_END = "time_sign_out_end";
+
     /**
      * 默认关闭活体
      */
@@ -201,4 +211,43 @@ public class Const {
      public static int up_count=0;
      public static int down_count=0;
 
+    /**
+     * Apk更新路径
+     */
+    public static String APK_UPDATE_PATH = "https://fir.im/6g21";
+
+    /**
+     * 服务器地址
+     */
+    private static String SERVER_IP = "http://124.133.246.162:38071/jsxt/api/";
+
+    /**
+     * 考勤终端注册接口
+     */
+    public static String REGISTER =  SERVER_IP + "device?";
+
+    /**
+     * 考勤终端登录接口
+     */
+    public static String LOGIN = SERVER_IP + "devicelogin?";
+
+    /**
+     * 人脸验证接口
+     */
+    public static String FACE_WITNESS = SERVER_IP + "faceVerify?";
+
+    /**
+     * 考勤参数
+     */
+    public static String PARAMETER = SERVER_IP + "atndquery?";
+
+    /**
+     * 培训登录
+     */
+    public static String STULOGIN = SERVER_IP + "stulogin?";
+
+    /**
+     * 培训登出
+     */
+    public static String STULOGOUT = SERVER_IP + "stulogout?";
 }

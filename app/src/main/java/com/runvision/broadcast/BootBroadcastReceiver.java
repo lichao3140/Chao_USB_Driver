@@ -5,7 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.runvision.g702_sn.MainActivity;
+import com.runvision.g702_sn.LoginActivity;
 
 public class BootBroadcastReceiver extends BroadcastReceiver {
     static final String ACTION = "android.intent.action.BOOT_COMPLETED";
@@ -14,7 +14,7 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         // TODO Auto-generated method stub
         if (intent.getAction().equals(ACTION)) {
-            Intent mainActivityIntent = new Intent(context, MainActivity.class);
+            Intent mainActivityIntent = new Intent(context, LoginActivity.class);
             mainActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(mainActivityIntent);
         }

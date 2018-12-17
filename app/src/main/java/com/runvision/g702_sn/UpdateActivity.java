@@ -136,7 +136,7 @@ public class UpdateActivity extends Activity {
         Log.d(TAG, "initView: -当前版本号-" + getVersionName());
         if (!(new File(apkPath).exists())) {
             Log.e(TAG, "initView: ----没找到该文件夹");
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
             finish();
             return;
@@ -155,7 +155,7 @@ public class UpdateActivity extends Activity {
             updataApk(apkPath);
         } else {
             Log.e(TAG, "initView: --没找到apk文件");
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
             finish();
         }
@@ -199,14 +199,14 @@ public class UpdateActivity extends Activity {
                 this.startActivity(intent);
               //  installApk(apkPath);
             } else {
-                Intent intent = new Intent(this, MainActivity.class);
+                Intent intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
                 finish();
                 Log.e(TAG, "updataApk: ---APK文件的版本是过低");
                 Toast.makeText(this, "这个已经是最新版本了", Toast.LENGTH_SHORT).show();
             }
         } else {
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
             finish();
             Log.e(TAG, "updataApk: ---这个APK文件不能用于本地更新");
