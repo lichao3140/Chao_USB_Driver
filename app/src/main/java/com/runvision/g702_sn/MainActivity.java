@@ -20,9 +20,16 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -35,6 +42,7 @@ import com.arcsoft.face.FaceInfo;
 import com.arcsoft.face.FaceSimilar;
 import com.arcsoft.face.LivenessInfo;
 import com.common.pos.api.util.PosUtil;
+import com.mylhyl.circledialog.CircleDialog;
 import com.runvision.bean.AppData;
 import com.runvision.bean.FaceInfoss;
 import com.runvision.bean.ImageStack;
@@ -93,7 +101,8 @@ import java.util.List;
 import java.util.Map;
 
 
-public class MainActivity extends AppCompatActivity implements NetWorkStateReceiver.INetStatusListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements NetWorkStateReceiver.INetStatusListener,
+        View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     private static String TAG = MainActivity.class.getSimpleName();
     public static Context mContext;
@@ -118,6 +127,11 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
     private View alert; //1:1
     private ImageView faceBmp_view, cardBmp_view, idcard_Bmp, isSuccessComper;
     private TextView card_name, card_sex, card_nation, name, year, month, day, addr, cardNumber, version;
+
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    private Toolbar toolbar;
+    private ActionBarDrawerToggle mDrawerToggle;
 
     private ImageView home_set;
 
@@ -680,6 +694,33 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
         imageStack = mCameraSurfView.getImgStack();
         home_layout = (RelativeLayout) findViewById(R.id.home_layout);//待机界面
 
+        drawerLayout = findViewById(R.id.drawer);
+        navigationView = findViewById(R.id.navigation);
+        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setItemIconTintList(null);//显示图片原始样式
+        toolbar = findViewById(R.id.main_toolbar);
+        mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close) {
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+//                if (admin_is_login) {
+//                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);//打开手势滑动
+//                    drawerLayout.openDrawer(GravityCompat.START);
+//                } else {
+//                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);//关闭手势滑动
+//                }
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                drawerLayout.closeDrawer(GravityCompat.START);
+            }
+        };
+        mDrawerToggle.syncState();
+        drawerLayout.setDrawerListener(mDrawerToggle);
+
         // 提示框
         promptshow_xml = findViewById(R.id.promptshow_xml);
         loadprompt = (TextView) promptshow_xml.findViewById(R.id.loadprompt);
@@ -1223,6 +1264,44 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
         }
         mPlayer = MediaPlayer.create(mContext, musicID);
         mPlayer.start();
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        int id = menuItem.getItemId();
+        switch (id) {
+            case R.id.nav_setting:
+//                settingTimeDialog();
+                break;
+            case R.id.nav_config:
+//                Atndquery();
+                break;
+            case R.id.nav_sign:
+//                Intent sign = new Intent(mContext, SignRecordActivity.class);
+//                startActivity(sign);
+                break;
+            case R.id.nav_add:
+                showConfirmPsdDialog();
+                break;
+            case R.id.nav_exit:
+//                showTipExit();
+                break;
+            case R.id.nav_update:
+
+                break;
+            case R.id.nav_about:
+                new CircleDialog.Builder()
+                        .setTitle("技术支持")
+                        .setText("深圳市元视科技有限公司")
+                        .setPositive("确定", null)
+                        .show(getSupportFragmentManager());
+                break;
+            default:
+                drawerLayout.closeDrawers();
+                break;
+        }
+        drawerLayout.closeDrawer(GravityCompat.START);
+        return false;
     }
 
     /**
