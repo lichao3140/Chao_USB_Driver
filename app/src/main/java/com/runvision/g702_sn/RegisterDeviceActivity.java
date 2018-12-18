@@ -2,7 +2,7 @@ package com.runvision.g702_sn;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,7 +21,6 @@ import com.runvision.utils.SPUtil;
 import com.runvision.utils.TimeUtils;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -32,7 +31,7 @@ import okhttp3.MediaType;
 /**
  * 考勤终端注册
  */
-public class RegisterDeviceActivity extends AppCompatActivity {
+public class RegisterDeviceActivity extends FragmentActivity {
 
     @BindView(R.id.et_inscode)
     EditText etInscode;

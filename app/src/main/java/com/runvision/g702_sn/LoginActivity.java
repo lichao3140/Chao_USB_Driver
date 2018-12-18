@@ -225,7 +225,7 @@ public class LoginActivity extends FragmentActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.regist:
-                Intent intent = new Intent(mContext, MainActivity.class);
+                Intent intent = new Intent(mContext, RegisterDeviceActivity.class);
                 startActivity(intent);
                 break;
             case R.id.iv_clean_user:

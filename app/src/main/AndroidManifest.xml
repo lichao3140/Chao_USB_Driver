@@ -99,19 +99,19 @@
         <!-- 配置APP ID -->
         <meta-data
             android:name="BUGLY_APPID"
-            android:value="1b738b3522" />
+            android:value="091526585b" />
         <!-- 配置APP版本号 -->
         <meta-data
             android:name="BUGLY_APP_VERSION"
-            android:value="2.2.0" />
+            android:value="2.0.0" />
         <!-- 配置APP渠道号 -->
         <meta-data
             android:name="BUGLY_APP_CHANNEL"
-            android:value="fd03b0cb-4048-41b8-b403-4feaa08f9540" />
+            android:value="76016c4f-f980-4df6-858e-12c64424b415" />
         <!-- 配置Bugly调试模式（true或者false）-->
         <meta-data
             android:name="BUGLY_ENABLE_DEBUG"
-            android:value="false" />
+            android:value="true" />
     </application>
 
 </manifest>
