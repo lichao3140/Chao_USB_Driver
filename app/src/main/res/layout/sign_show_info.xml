@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/x180"
+    android:stretchColumns="*"
+    android:background="@color/white" >
+
+    <TextView
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="本次签到内容"
+        android:textSize="30sp"/>
+
+    <TableRow
+        android:id="@+id/tr_subject"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="考勤科目:"
+            android:textSize="25sp"
+            android:textColor="@color/blue"/>
+
+        <TextView
+            android:id="@+id/info_tv_subject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="科目一"
+            android:textSize="20sp"
+            android:textColor="@color/red"/>
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tr_classcode"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="课堂编号:"
+            android:textSize="25sp"
+            android:textColor="@color/blue"/>
+
+        <TextView
+            android:id="@+id/info_tv_classcode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="91620866542145536"
+            android:textSize="20sp"
+            android:textColor="@color/red"/>
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tr_coursename"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="课程名称:"
+            android:textSize="25sp"
+            android:textColor="@color/blue"/>
+
+        <TextView
+            android:id="@+id/info_tv_coursename"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="法律、法规及道路交通信号|机动车基本知识"
+            android:textSize="20sp"
+            android:textColor="@color/red"/>
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tr_coursecode"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="课程编号:"
+            android:textSize="25sp"
+            android:textColor="@color/blue"/>
+
+        <TextView
+            android:id="@+id/info_tv_coursecode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="01,02"
+            android:textSize="20sp"
+            android:textColor="@color/red"/>
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tr_targetlen"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="课时(分钟):"
+            android:textSize="25sp"
+            android:textColor="@color/blue"/>
+
+        <TextView
+            android:id="@+id/info_tv_targetlen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="45"
+            android:textSize="20sp"
+            android:textColor="@color/red"/>
+    </TableRow>
+
+</TableLayout >

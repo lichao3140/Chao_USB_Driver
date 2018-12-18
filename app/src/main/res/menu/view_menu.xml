@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group>
+        <item
+            android:id="@+id/nav_setting"
+            android:title="考勤设置"
+            android:icon="@mipmap/userinfomodify_n"/>
+        <item
+            android:id="@+id/nav_config"
+            android:title="考勤参数"
+            android:icon="@mipmap/adduser_n"/>
+        <item
+            android:id="@+id/nav_sign"
+            android:title="考勤记录"
+            android:icon="@mipmap/switchuser_n"/>
+    </group>
+    <group android:id="@+id/group_manage">
+        <item
+            android:id="@+id/nav_add"
+            android:title="模板注册"
+            android:icon="@mipmap/adduser_n"/>
+        <item
+            android:id="@+id/nav_exit"
+            android:title="退出"
+            android:icon="@mipmap/switchuser_n"/>
+    </group>
+    <group
+        android:checkableBehavior="none"
+        android:id="@+id/group_settings">
+        <item android:id="@+id/nav_update"
+            android:title="版本更新"/>
+        <item android:id="@+id/nav_about"
+            android:title="关于软件"/>
+    </group>
+</menu>

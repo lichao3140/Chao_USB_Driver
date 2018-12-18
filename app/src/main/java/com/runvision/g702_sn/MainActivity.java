@@ -95,6 +95,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements NetWorkStateReceiver.INetStatusListener, View.OnClickListener {
 
+    private static String TAG = MainActivity.class.getSimpleName();
     public static Context mContext;
     private Intent intentService;
     private MyRedThread mMyRedThread;//红外线程
@@ -138,7 +139,6 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
     private boolean Infra_red = true;
     private ImageStack imageStack;
     private int timingnum = 0;//待机
-    private String TAG = "MainActivity";
 
     private MyApplication application;
     // ----------------------------------------读卡器参数----------------------------------
