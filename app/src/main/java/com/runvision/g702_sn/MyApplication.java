@@ -3,6 +3,7 @@ package com.runvision.g702_sn;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -13,6 +14,8 @@ import android.support.multidex.MultiDex;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.runvision.bean.DaoMaster;
+import com.runvision.bean.DaoSession;
 import com.runvision.bean.FaceLibCore;
 import com.runvision.core.Const;
 import com.runvision.db.Admin;
@@ -48,6 +51,8 @@ public class MyApplication extends Application {
 
     public static Map<String,byte[]> mList = new HashMap<String,byte[]>();
 
+    private final static String DB_NAME = "sing_record.db";
+    private static DaoSession daoSession;
     Uri mImage;
 
     public static MyApplication getInstance() {
@@ -222,5 +227,23 @@ public class MyApplication extends Application {
 
     public Uri getCaptureImage() {
         return mImage;
+    }
+
+    /**
+     * 配置数据库
+     */
+    private void setupDatabase() {
+        //创建数据库sing_record.db
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, DB_NAME, null);
+        //获取可写数据库
+        SQLiteDatabase db = helper.getWritableDatabase();
+        //获取数据库对象
+        DaoMaster daoMaster = new DaoMaster(db);
+        //获取dao对象管理者
+        daoSession = daoMaster.newSession();
+    }
+
+    public static DaoSession getDaoSession() {
+        return daoSession;
     }
 }
