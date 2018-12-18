@@ -6,6 +6,8 @@
 ##### .mode column
 ##### .header on
 
+##### keytool -list -v -keystore F:\mywork\android_key.jks -storepass lichao
+
 root@rk3288:/data/data/com.runvision.faceagm_1v1vn
 chmod 777 FaceTemplate.db
 

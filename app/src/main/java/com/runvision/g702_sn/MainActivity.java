@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -92,7 +93,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class MainActivity extends Activity implements NetWorkStateReceiver.INetStatusListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements NetWorkStateReceiver.INetStatusListener, View.OnClickListener {
 
     public static Context mContext;
     private Intent intentService;
