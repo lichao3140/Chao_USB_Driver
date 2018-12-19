@@ -59,6 +59,7 @@ import com.runvision.bean.Atnd;
 import com.runvision.bean.AtndResponse;
 import com.runvision.bean.Cours;
 import com.runvision.bean.CoursDao;
+import com.runvision.bean.DaoSession;
 import com.runvision.bean.FaceInfoss;
 import com.runvision.bean.IDCardDao;
 import com.runvision.bean.ImageStack;
@@ -120,6 +121,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import es.dmoral.toasty.Toasty;
 import okhttp3.Call;
 import okhttp3.MediaType;
@@ -129,6 +132,17 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
         View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, OnDateSetListener {
 
     private static String TAG = MainActivity.class.getSimpleName();
+    @BindView(R.id.info_tv_subject)
+    TextView infoTvSubject;
+    @BindView(R.id.info_tv_classcode)
+    TextView infoTvClasscode;
+    @BindView(R.id.info_tv_coursename)
+    TextView infoTvCoursename;
+    @BindView(R.id.info_tv_coursecode)
+    TextView infoTvCoursecode;
+    @BindView(R.id.info_tv_targetlen)
+    TextView infoTvTargetlen;
+
     public static Context mContext;
     private Intent intentService;
     private MyRedThread mMyRedThread;//红外线程
@@ -406,7 +420,9 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
                         mHandler.sendMessageDelayed(mHandler.obtainMessage(Const.MSG_READ_CARD, ""), 100);
                     }
                     break;
-
+                case Const.SELECTED_COURSE:
+//                    initSignCourse();
+                    break;
                 case Const.MSG_FACE://开启一比n处理
                     if (SPUtil.getBoolean(Const.KEY_ISOPEN_N, Const.OPEN_ONE_VS_N)) {
                         FaceInfoss info = (FaceInfoss) msg.obj;
@@ -554,7 +570,6 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
                 case 100:/*VMS批量导入结束操作---一个线程*/
                     int success0 = (int) msg.obj;
                     bacthOk0 = success0;
-                    Log.e("lichaoo", "100:" + bacthOk0 + Const.VMS_ERROR_TEMPLATE + "=" + mSum);
                     if (bacthOk0 + Const.VMS_ERROR_TEMPLATE >= mSum) {
                         Const.VMS_TEMPLATE = Const.VMS_TEMPLATE + 20;
                         Const.VMS_BATCH_IMPORT_TEMPLATE = false;
@@ -563,7 +578,6 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
                 case 101:/*VMS批量导入结束操作---三个线程*/
                     int success1 = (int) msg.obj;
                     bacthOk1 = success1;
-//                    Log.e("lichaoo", "101:" + bacthOk1 + bacthOk2 + bacthOk3 + "=" + mSum);
                     if (bacthOk1 + bacthOk2 + bacthOk3 == mSum) {
                         Const.VMS_TEMPLATE = Const.VMS_TEMPLATE + 20;
                         Const.VMS_BATCH_IMPORT_TEMPLATE = false;
@@ -572,7 +586,6 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
                 case 102:/*VMS批量导入结束操作*/
                     int success2 = (int) msg.obj;
                     bacthOk2 = success2;
-//                    Log.e("lichaoo", "102:" + bacthOk1 + bacthOk2 + bacthOk3 + "=" + mSum);
                     if (bacthOk1 + bacthOk2 + bacthOk3 == mSum) {
                         Const.VMS_TEMPLATE = Const.VMS_TEMPLATE + 20;
                         Const.VMS_BATCH_IMPORT_TEMPLATE = false;
@@ -601,11 +614,14 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);//去掉标题栏
         setContentView(R.layout.activity_main);
-        // 全屏代码
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        hideBottomUIMenu();
-        initView();
         mContext = this;
+        ButterKnife.bind(this);
+//        DaoSession daoSession = application.getDaoSession();
+//        idCardDao = daoSession.getIDCardDao();
+//        coursDao = daoSession.getCoursDao();
+
+        initView();
+//        initSignCourse();
 
         application = (MyApplication) getApplication();
         application.init();
@@ -794,6 +810,26 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
             showConfirmPsdDialog();
             isOpenOneVsMore = false;
         });
+    }
+
+    private void initSignCourse() {
+        String sign_classcode = SPUtil.getString(Const.SELECT_COURSE_NAME, "");
+        if (!sign_classcode.equals("")) {
+            Cours sign_class = coursDao.queryBuilder().where(CoursDao.Properties.Classcode.eq(sign_classcode)).unique();
+            if (sign_class != null) {
+                infoTvSubject.setText(sign_class.getSubject());
+                infoTvClasscode.setText(sign_class.getClasscode());
+                infoTvCoursename.setText(sign_class.getCoursename());
+                infoTvCoursecode.setText(sign_class.getCoursecode());
+                infoTvTargetlen.setText(sign_class.getTargetlen());
+            }
+        } else {
+            infoTvSubject.setText("管理员请选择考勤参数");
+            infoTvClasscode.setText("管理员请选择考勤参数");
+            infoTvCoursename.setText("管理员请选择考勤参数");
+            infoTvCoursecode.setText("管理员请选择考勤参数");
+            infoTvTargetlen.setText("管理员请选择考勤参数");
+        }
     }
 
     /**
