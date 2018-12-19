@@ -27,6 +27,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -44,9 +45,15 @@ import com.arcsoft.face.FaceInfo;
 import com.arcsoft.face.FaceSimilar;
 import com.arcsoft.face.LivenessInfo;
 import com.common.pos.api.util.PosUtil;
+import com.jzxiang.pickerview.TimePickerDialog;
+import com.jzxiang.pickerview.data.Type;
+import com.jzxiang.pickerview.listener.OnDateSetListener;
 import com.mylhyl.circledialog.CircleDialog;
+import com.runvision.adapter.PictureTypeEntity;
 import com.runvision.bean.AppData;
+import com.runvision.bean.CoursDao;
 import com.runvision.bean.FaceInfoss;
+import com.runvision.bean.IDCardDao;
 import com.runvision.bean.ImageStack;
 import com.runvision.broadcast.NetWorkStateReceiver;
 import com.runvision.broadcast.UdiskReceiver;
@@ -71,6 +78,7 @@ import com.runvision.utils.SPUtil;
 import com.runvision.utils.SendData;
 import com.runvision.utils.TestDate;
 import com.runvision.utils.TimeCompareUtil;
+import com.runvision.utils.TimeUtils;
 import com.runvision.webcore.ServerManager;
 import com.telpo.tps550.api.TelpoException;
 import com.telpo.tps550.api.idcard.IdCard;
@@ -104,7 +112,7 @@ import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity implements NetWorkStateReceiver.INetStatusListener,
-        View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
+        View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, OnDateSetListener {
 
     private static String TAG = MainActivity.class.getSimpleName();
     public static Context mContext;
@@ -182,6 +190,16 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
     private Boolean SysTimeflag = true;
 
     private List<User> mList;
+    private TimePickerDialog mDialogHourMinute;
+    //时间选择
+    private String selectTime;
+    //考勤课程选择
+    private String select_index;
+    private int selectId;
+    public static IDCardDao idCardDao;
+    private CoursDao coursDao;
+
+    SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     /**
      * 消息响应
@@ -1273,7 +1291,7 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
         int id = menuItem.getItemId();
         switch (id) {
             case R.id.nav_setting:
-//                settingTimeDialog();
+                settingTimeDialog();
                 break;
             case R.id.nav_config:
 //                Atndquery();
@@ -1304,6 +1322,104 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
         }
         drawerLayout.closeDrawer(GravityCompat.START);
         return false;
+    }
+
+    /**
+     * 考勤时间设置
+     */
+    private void settingTimeDialog() {
+        final List<PictureTypeEntity> list = new ArrayList<>();
+
+        list.add(new PictureTypeEntity(1, "签到开始时间:"));
+        if (SPUtil.getString(Const.TIME_SIGN_BEGIN, "").equals("")) {
+            list.add(new PictureTypeEntity(3, TimeUtils.getYearMonth() + "\t" + AppData.getAppData().getInstarttime()));
+        } else {
+            list.add(new PictureTypeEntity(3, TimeUtils.getYearMonth() + "\t" + SPUtil.getString(Const.TIME_SIGN_BEGIN, "")));
+        }
+
+        list.add(new PictureTypeEntity(2, "签到结束时间:"));
+        if (SPUtil.getString(Const.TIME_SIGN_END, "").equals("")) {
+            list.add(new PictureTypeEntity(4, TimeUtils.getYearMonth() + "\t" + AppData.getAppData().getInendtime()));
+        } else {
+            list.add(new PictureTypeEntity(4, TimeUtils.getYearMonth() + "\t" + SPUtil.getString(Const.TIME_SIGN_END, "")));
+        }
+
+        list.add(new PictureTypeEntity(5, "签退开始时间:"));
+        if (SPUtil.getString(Const.TIME_SIGN_OUT_BEGIN, "").equals("")) {
+            list.add(new PictureTypeEntity(7, TimeUtils.getYearMonth() + "\t" + AppData.getAppData().getOutstarttime()));
+        } else {
+            list.add(new PictureTypeEntity(7, TimeUtils.getYearMonth() + "\t" + SPUtil.getString(Const.TIME_SIGN_OUT_BEGIN, "")));
+        }
+
+        list.add(new PictureTypeEntity(6, "签退结束时间:"));
+        if (SPUtil.getString(Const.TIME_SIGN_OUT_END, "").equals("")) {
+            list.add(new PictureTypeEntity(8, TimeUtils.getYearMonth() + "\t" + AppData.getAppData().getOutendtime()));
+        } else {
+            list.add(new PictureTypeEntity(8, TimeUtils.getYearMonth() + "\t" + SPUtil.getString(Const.TIME_SIGN_OUT_END, "")));
+        }
+
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
+        new CircleDialog.Builder()
+                .setTitle("考勤时间设置")
+                .configItems(params -> params.dividerHeight = 0)
+                .setItems(list, gridLayoutManager, (view13, position13) -> {
+                    showTimeHoursMin();
+                    mDialogHourMinute.show(getSupportFragmentManager(), "hour_minute");
+                    selectId = list.get(position13).id;
+                })
+                .setNegative("取消", null)
+                .show(getSupportFragmentManager());
+    }
+
+    /**
+     * 显示小时 - 分钟
+     */
+    private void showTimeHoursMin() {
+        mDialogHourMinute = new TimePickerDialog.Builder()
+                .setTitleStringId("选择时间")
+                .setType(Type.HOURS_MINS)
+                .setCallBack(this)
+                .build();
+    }
+
+    @Override
+    public void onDateSet(TimePickerDialog timePickerView, long millseconds) {
+        selectTime = getDateToString(millseconds).substring(11, 19);
+
+        switch (selectId) {
+            case 1:
+            case 3:
+                AppData.getAppData().setInstarttime(selectTime);
+                SPUtil.putString(Const.TIME_SIGN_BEGIN, selectTime);
+                Toast.makeText(mContext, "签到开始时间:" + selectTime, Toast.LENGTH_SHORT).show();
+                break;
+
+            case 2:
+            case 4:
+                AppData.getAppData().setInendtime(selectTime);
+                SPUtil.putString(Const.TIME_SIGN_END, selectTime);
+                Toast.makeText(mContext, "签到结束时间:" + selectTime, Toast.LENGTH_SHORT).show();
+                break;
+
+            case 5:
+            case 7:
+                AppData.getAppData().setOutstarttime(selectTime);
+                SPUtil.putString(Const.TIME_SIGN_OUT_BEGIN, selectTime);
+                Toast.makeText(mContext, "签退开始时间:" + selectTime, Toast.LENGTH_SHORT).show();
+                break;
+
+            case 6:
+            case 8:
+                AppData.getAppData().setOutendtime(selectTime);
+                SPUtil.putString(Const.TIME_SIGN_OUT_END, selectTime);
+                Toast.makeText(mContext, "签退结束时间:" + selectTime, Toast.LENGTH_SHORT).show();
+                break;
+        }
+    }
+
+    public String getDateToString(long time) {
+        Date d = new Date(time);
+        return sf.format(d);
     }
 
     /**
