@@ -22,6 +22,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -29,6 +30,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -1284,7 +1286,7 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
                 showConfirmPsdDialog();
                 break;
             case R.id.nav_exit:
-//                showTipExit();
+                showTipExit();
                 break;
             case R.id.nav_update:
 
@@ -1981,5 +1983,65 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
                 }
             }
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            showTipExit();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    /**
+     * 返回退出
+     */
+    private int time = 10;
+    private DialogFragment dialogFragment;
+    private Handler handler;
+    private Runnable runnable;
+
+    private void showTipExit() {
+        time = 10;
+        CircleDialog.Builder builder = new CircleDialog.Builder()
+                .setTitle("驾校考勤")
+                .setText("是否退出应用?")
+                .configPositive(params -> params.disable = true)
+                .setPositive("确定(" + time + "s)", v -> application.finishActivity())
+                .setNegative("取消", null);
+
+        builder.setOnDismissListener(dialog -> removeRunnable());
+        dialogFragment = builder.show(getSupportFragmentManager());
+
+        handler = new Handler();
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                builder.configPositive(params -> {
+                    --time;
+                    params.text = "确定(" + time + "s)";
+                    if (time == 0) {
+                        params.disable = false;
+                        params.text = "确定";
+                    }
+                }).create();
+
+                if (time == 0)
+                    handler.removeCallbacks(this);
+                else
+                    handler.postDelayed(this, 1000);
+
+            }
+        };
+        handler.postDelayed(runnable, 1000);
+    }
+
+    private void removeRunnable() {
+        if (handler != null) {
+            handler.removeCallbacks(runnable);
+        }
+        handler = null;
+        runnable = null;
     }
 }
