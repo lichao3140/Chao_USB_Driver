@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.media.MediaPlayer;
@@ -45,12 +46,18 @@ import com.arcsoft.face.FaceInfo;
 import com.arcsoft.face.FaceSimilar;
 import com.arcsoft.face.LivenessInfo;
 import com.common.pos.api.util.PosUtil;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.jzxiang.pickerview.TimePickerDialog;
 import com.jzxiang.pickerview.data.Type;
 import com.jzxiang.pickerview.listener.OnDateSetListener;
 import com.mylhyl.circledialog.CircleDialog;
+import com.runvision.adapter.CheckedAdapter;
 import com.runvision.adapter.PictureTypeEntity;
 import com.runvision.bean.AppData;
+import com.runvision.bean.Atnd;
+import com.runvision.bean.AtndResponse;
+import com.runvision.bean.Cours;
 import com.runvision.bean.CoursDao;
 import com.runvision.bean.FaceInfoss;
 import com.runvision.bean.IDCardDao;
@@ -74,6 +81,7 @@ import com.runvision.utils.DateTimeUtils;
 import com.runvision.utils.FileUtils;
 import com.runvision.utils.IDUtils;
 import com.runvision.utils.LogToFile;
+import com.runvision.utils.RSAUtils;
 import com.runvision.utils.SPUtil;
 import com.runvision.utils.SendData;
 import com.runvision.utils.TestDate;
@@ -84,6 +92,8 @@ import com.telpo.tps550.api.TelpoException;
 import com.telpo.tps550.api.idcard.IdCard;
 import com.telpo.tps550.api.idcard.IdentityInfo;
 import com.telpo.tps550.api.util.ShellUtils;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
 import com.zkteco.android.IDReader.IDPhotoHelper;
 import com.zkteco.android.IDReader.WLTService;
 import com.zkteco.android.biometric.core.device.ParameterHelper;
@@ -109,6 +119,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import es.dmoral.toasty.Toasty;
+import okhttp3.Call;
+import okhttp3.MediaType;
 
 
 public class MainActivity extends AppCompatActivity implements NetWorkStateReceiver.INetStatusListener,
@@ -1294,7 +1308,7 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
                 settingTimeDialog();
                 break;
             case R.id.nav_config:
-//                Atndquery();
+                Atndquery();
                 break;
             case R.id.nav_sign:
 //                Intent sign = new Intent(mContext, SignRecordActivity.class);
@@ -2098,6 +2112,116 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
                     mHandler.sendMessage(msg);
                 }
             }
+        }
+    }
+
+    /**
+     * 网络请求考勤参数
+     */
+    public void Atndquery() {
+        try {
+            String inscode = SPUtil.getString(Const.DEV_INSCODE, "");
+            String privateKey = SPUtil.getString(Const.PRIVATE_KEY, "");
+            String devnum = SPUtil.getString(Const.DEV_NUM, "");
+            String ts = TimeUtils.getTime13();
+            String sign = inscode + devnum + ts;
+            byte[] ss = sign.getBytes();
+            String sign_str = RSAUtils.sign(ss, privateKey);
+
+            OkHttpUtils.postString()
+                    .url(Const.PARAMETER + "ts=" + TimeUtils.getTime13() + "&sign=" + sign_str)
+                    .content(new Gson().toJson(new Atnd(sign_str, inscode, devnum, ts)))
+                    .mediaType(MediaType.parse("application/json; charset=utf-8"))
+                    .build()
+                    .execute(new StringCallback() {
+                        @Override
+                        public void onError(Call call, Exception e, int id) {
+                            Toasty.error(mContext, mContext.getString(R.string.toast_request_error), Toast.LENGTH_LONG, true).show();
+                        }
+
+                        @Override
+                        public void onResponse(String response, int id) {
+                            Log.i("lichao", "考勤参数:" + response);
+                            if (!response.equals("resource/500")) {
+                                Gson gson = new Gson();
+                                AtndResponse gsonAtnd = gson.fromJson(response, AtndResponse.class);
+                                if (gsonAtnd.getErrorcode().equals("0")) {
+                                    showInfo(gsonAtnd.getData());
+                                    Toasty.success(mContext, mContext.getString(R.string.toast_update_success), Toast.LENGTH_SHORT, true).show();
+                                } else {
+                                    Toasty.error(mContext, mContext.getString(R.string.toast_update_fail), Toast.LENGTH_LONG, true).show();
+                                }
+                            } else {
+                                Toasty.error(mContext, mContext.getString(R.string.toast_server_error), Toast.LENGTH_LONG, true).show();
+                            }
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 显示获取的网络请求应答数据
+     *
+     * @param coursData
+     */
+    private void showInfo(String coursData) {
+        try {
+            Gson gson = new Gson();
+            List<Cours> coursList = gson.fromJson(coursData, new TypeToken<List<Cours>>() {
+            }.getType());
+            String[] cours_Coursename = new String[coursList.size()];
+
+            for (int i = 0; i < coursList.size(); i++) {
+                cours_Coursename[i] = String.valueOf(coursList.get(i).getCoursename());
+            }
+
+            //对话框显示课程内容
+            CheckedAdapter checkedAdapterR = new CheckedAdapter(this, cours_Coursename, true);
+            new CircleDialog.Builder()
+                    .configDialog(params ->
+                            params.backgroundColorPress = Color.CYAN)
+                    .setTitle("考勤参数")
+                    .setSubTitle("请选择要考勤的课程")
+                    .setItems(checkedAdapterR, (parent, view15, position15, id) ->
+                            checkedAdapterR.toggle(position15, cours_Coursename[position15]))
+                    .setItemsManualClose(true)
+                    .setPositive("确定", v -> {
+                        if (!checkedAdapterR.getSaveChecked().toString().equals("{}")) {
+                            select_index = checkedAdapterR.getSaveChecked().toString().substring(1, 2);
+                            SPUtil.putString(Const.SELECT_COURSE_NAME, coursList.get(Integer.parseInt(select_index)).getClasscode());
+                            Message msg = new Message();
+                            msg.what = Const.SELECTED_COURSE;
+                            mHandler.sendMessage(msg);
+                            Toasty.info(mContext, "选课成功", Toast.LENGTH_SHORT, true).show();
+                        }
+                    })
+                    .show(getSupportFragmentManager());
+
+            for (int j = 0; j < coursList.size(); j++) {
+                Log.i(TAG, "Classcode:" + coursList.get(j).getClasscode());
+                //考勤参数保存到本地数据库
+                Cours class_code = coursDao.queryBuilder().where(CoursDao.Properties.Classcode.eq(coursList.get(j).getClasscode())).unique();
+                Cours cours = new Cours();
+                if (class_code == null) {//保存
+                    cours.setCoursename(coursList.get(j).getCoursename());
+                    cours.setSubject(coursList.get(j).getSubject());
+                    cours.setCoursecode(coursList.get(j).getCoursecode());
+                    cours.setClasscode(coursList.get(j).getClasscode());
+                    cours.setTargetlen(coursList.get(j).getTargetlen());
+                    coursDao.insert(cours);
+                } else {//更新
+                    cours.setCoursename(coursList.get(j).getCoursename());
+                    cours.setSubject(coursList.get(j).getSubject());
+                    cours.setCoursecode(coursList.get(j).getCoursecode());
+                    cours.setClasscode(coursList.get(j).getClasscode());
+                    cours.setTargetlen(coursList.get(j).getTargetlen());
+                    coursDao.update(cours);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
