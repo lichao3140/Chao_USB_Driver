@@ -421,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
                     }
                     break;
                 case Const.SELECTED_COURSE:
-//                    initSignCourse();
+                    initSignCourse();
                     break;
                 case Const.MSG_FACE://开启一比n处理
                     if (SPUtil.getBoolean(Const.KEY_ISOPEN_N, Const.OPEN_ONE_VS_N)) {
@@ -616,12 +616,12 @@ public class MainActivity extends AppCompatActivity implements NetWorkStateRecei
         setContentView(R.layout.activity_main);
         mContext = this;
         ButterKnife.bind(this);
-//        DaoSession daoSession = application.getDaoSession();
-//        idCardDao = daoSession.getIDCardDao();
-//        coursDao = daoSession.getCoursDao();
+        DaoSession daoSession = application.getDaoSession();
+        idCardDao = daoSession.getIDCardDao();
+        coursDao = daoSession.getCoursDao();
 
         initView();
-//        initSignCourse();
+        initSignCourse();
 
         application = (MyApplication) getApplication();
         application.init();

@@ -98,7 +98,10 @@ public class MyApplication extends Application {
             faceProvider.addAdmin(new Admin("admin", "123456"));
         }
 
+        //加载模板
         loadTemper();
+        //配置数据库
+        setupDatabase();
         SPUtil.putString(Const.KEY_EDITION, "(V "+LogToFile.getAppVersionName(getContext())+")");
         //Bugly Crash获取
         CrashReport.initCrashReport(getApplicationContext());
