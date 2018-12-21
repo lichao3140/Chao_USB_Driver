@@ -353,7 +353,8 @@ public class LoginActivity extends FragmentActivity {
                 Toasty.success(mContext, getString(R.string.toast_login_success), Toast.LENGTH_SHORT, true).show();
             } else {
                 progressBar.setVisibility(View.INVISIBLE);
-                Toasty.warning(mContext, "模板图片保存失败", Toast.LENGTH_SHORT, true).show();
+                faceSP.clear();
+                Toasty.warning(mContext, "管理员人脸模板有误,请检验后再登录!", Toast.LENGTH_LONG, true).show();
             }
         }
     }
@@ -391,6 +392,7 @@ public class LoginActivity extends FragmentActivity {
             }
         } else {
             generateTemplate = false;
+            Toasty.warning(mContext, "无人脸!", Toast.LENGTH_LONG, true).show();
             System.out.println("无人脸");
         }
         return generateTemplate;
