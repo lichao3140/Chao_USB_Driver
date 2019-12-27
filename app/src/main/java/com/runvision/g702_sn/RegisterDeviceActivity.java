@@ -157,21 +157,21 @@ public class RegisterDeviceActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(String response, int id) {
                             Log.i("lichao", "success:" + response);
-                            if (!response.equals("resource/500")) {
-                                DeviceResponse gsonData = gson.fromJson(response, DeviceResponse.class);
-                                if (gsonData.getErrorcode() == 0) {
-                                    SPUtil.putString(Const.DEV_INSCODE, etInscode.getText().toString().trim());
-                                    SPUtil.putString(Const.PRIVATE_KEY, gsonData.getData().getPrivateKey());
-                                    SPUtil.putString(Const.DEV_GPS, gps);
-                                    SPUtil.putString(Const.DEV_NUM, gsonData.getData().getDevnum());
-                                    //finish();
-                                    Toasty.success(mContext, getString(R.string.toast_register_success), Toast.LENGTH_SHORT, true).show();
-                                } else {
-                                    Toasty.error(mContext, getString(R.string.toast_register_error_code) + gsonData.getErrorcode(), Toast.LENGTH_LONG, true).show();
-                                }
-                            } else {
-                                Toasty.error(mContext, getString(R.string.toast_server_error), Toast.LENGTH_LONG, true).show();
-                            }
+//                            if (!response.equals("resource/500")) {
+//                                DeviceResponse gsonData = gson.fromJson(response, DeviceResponse.class);
+//                                if (gsonData.getErrorcode() == 0) {
+//                                    SPUtil.putString(Const.DEV_INSCODE, etInscode.getText().toString().trim());
+//                                    SPUtil.putString(Const.PRIVATE_KEY, gsonData.getData().getPrivateKey());
+//                                    SPUtil.putString(Const.DEV_GPS, gps);
+//                                    SPUtil.putString(Const.DEV_NUM, gsonData.getData().getDevnum());
+//                                    finish();
+//                                    Toasty.success(mContext, getString(R.string.toast_register_success), Toast.LENGTH_SHORT, true).show();
+//                                } else {
+//                                    Toasty.error(mContext, getString(R.string.toast_register_error_code) + gsonData.getErrorcode(), Toast.LENGTH_LONG, true).show();
+//                                }
+//                            } else {
+//                                Toasty.error(mContext, getString(R.string.toast_server_error), Toast.LENGTH_LONG, true).show();
+//                            }
                         }
                     });
         } catch (Exception e) {
