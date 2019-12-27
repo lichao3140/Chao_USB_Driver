@@ -159,7 +159,7 @@ public class Const {
     /**
      * 默认关闭活体
      */
-    public static final boolean OPEN_LIVE = false;
+    public static final boolean OPEN_LIVE = true;
 
     /**
      * 默认开启1比N
@@ -220,12 +220,12 @@ public class Const {
     /**
      * 服务器地址
      */
-    private static String SERVER_IP = "http://124.133.246.162:38071/jsxt/api/";
+    private static String SERVER_IP = "http://122.14.195.155:8090/PeriodAPI/";
 
     /**
      * 考勤终端注册接口
      */
-    public static String REGISTER =  SERVER_IP + "device?";
+    public static String REGISTER =  SERVER_IP + "device/1.0?";
 
     /**
      * 考勤终端登录接口

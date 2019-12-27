@@ -16,11 +16,18 @@ import com.google.gson.Gson;
 import com.runvision.bean.Device;
 import com.runvision.bean.DeviceResponse;
 import com.runvision.core.Const;
+import com.runvision.utils.HMACSHA1;
 import com.runvision.utils.MACUtil;
 import com.runvision.utils.SPUtil;
 import com.runvision.utils.TimeUtils;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
+
+import org.json.JSONObject;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -108,44 +115,70 @@ public class RegisterDeviceActivity extends AppCompatActivity {
      * 考勤终端注册
      */
     private void deviceRegister() {
-        String gps = etGpsLon.getText().toString().trim() + "|" + etGpsLat.getText().toString().trim();
-        OkHttpUtils.postString()
-                .url(Const.REGISTER + "ts=" + TimeUtils.getTime13())
-                .content(new Gson().toJson(new Device(
-                        etInscode.getText().toString().trim(),
-                        Integer.valueOf(etTermtype.getText().toString()),
-                        etVender.getText().toString().trim(),
-                        etModel.getText().toString().trim(),
-                        gps,
-                        etImei.getText().toString())))
-                .mediaType(MediaType.parse("application/json; charset=utf-8"))
-                .build()
-                .execute(new StringCallback() {
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        Toasty.error(mContext, getString(R.string.toast_request_error), Toast.LENGTH_LONG, true).show();
-                    }
+        try {
+            String gps = etGpsLon.getText().toString().trim() + "|" + etGpsLat.getText().toString().trim();
+//            String json_str = new Gson().toJson(new Device(
+//                    etInscode.getText().toString().trim(),
+//                    Integer.valueOf(etTermtype.getText().toString()),
+//                    etVender.getText().toString().trim(),
+//                    etModel.getText().toString().trim(),
+//                    gps,
+//                    etImei.getText().toString()));
 
-                    @Override
-                    public void onResponse(String response, int id) {
-                        Log.i("lichao", "success:" + response);
-                        if (!response.equals("resource/500")) {
-                            DeviceResponse gsonData = gson.fromJson(response, DeviceResponse.class);
-                            if (gsonData.getErrorcode() == 0) {
-                                SPUtil.putString(Const.DEV_INSCODE, etInscode.getText().toString().trim());
-                                SPUtil.putString(Const.PRIVATE_KEY, gsonData.getData().getPrivateKey());
-                                SPUtil.putString(Const.DEV_GPS, gps);
-                                SPUtil.putString(Const.DEV_NUM, gsonData.getData().getDevnum());
-                                finish();
-                                Toasty.success(mContext, getString(R.string.toast_register_success), Toast.LENGTH_SHORT, true).show();
-                            } else {
-                                Toasty.error(mContext, getString(R.string.toast_register_error_code) + gsonData.getErrorcode(), Toast.LENGTH_LONG, true).show();
-                            }
-                        } else {
-                            Toasty.error(mContext, getString(R.string.toast_server_error), Toast.LENGTH_LONG, true).show();
+            JSONObject jsonParam = new JSONObject();
+            jsonParam.put("inscode", etInscode.getText().toString().trim());//培训机构编号
+            jsonParam.put("termtype", etTermtype.getText().toString());//计时终端类型
+            jsonParam.put("vender", etVender.getText().toString());//计时终端类型
+            jsonParam.put("model", etModel.getText().toString());//计时终端类型
+            jsonParam.put("gps", gps);//计时终端类型
+            jsonParam.put("imei", etImei.getText().toString());//计时终端类型
+
+            Log.i("lichao", "json_str:" + jsonParam.toString());
+
+            String hmacSign = HMACSHA1.HmacSHA1Encrypt(jsonParam.toString(), "240a3b5707a2aceaba771dde8c32083d");
+            Log.e("lichao", "hmacSign:" + hmacSign);
+
+            JSONObject hmac_json = new JSONObject();
+            //hmac_json.put("usercode", "8520@201912");
+            hmac_json.put("hmaccode", hmacSign);
+
+            Log.i("lichao", "hmac_json:" + hmac_json.toString());
+
+            OkHttpUtils.postString()
+                    .url(Const.REGISTER)
+                    .content(hmac_json.toString())
+                    .mediaType(MediaType.parse("application/json; charset=utf-8"))
+                    .build()
+                    .execute(new StringCallback() {
+                        @Override
+                        public void onError(Call call, Exception e, int id) {
+                            Log.i("lichao",  call.request().url() + " error:" + e.getMessage());
+                            Toasty.error(mContext, getString(R.string.toast_request_error), Toast.LENGTH_LONG, true).show();
                         }
-                    }
-                });
+
+                        @Override
+                        public void onResponse(String response, int id) {
+                            Log.i("lichao", "success:" + response);
+                            if (!response.equals("resource/500")) {
+                                DeviceResponse gsonData = gson.fromJson(response, DeviceResponse.class);
+                                if (gsonData.getErrorcode() == 0) {
+                                    SPUtil.putString(Const.DEV_INSCODE, etInscode.getText().toString().trim());
+                                    SPUtil.putString(Const.PRIVATE_KEY, gsonData.getData().getPrivateKey());
+                                    SPUtil.putString(Const.DEV_GPS, gps);
+                                    SPUtil.putString(Const.DEV_NUM, gsonData.getData().getDevnum());
+                                    finish();
+                                    Toasty.success(mContext, getString(R.string.toast_register_success), Toast.LENGTH_SHORT, true).show();
+                                } else {
+                                    Toasty.error(mContext, getString(R.string.toast_register_error_code) + gsonData.getErrorcode(), Toast.LENGTH_LONG, true).show();
+                                }
+                            } else {
+                                Toasty.error(mContext, getString(R.string.toast_server_error), Toast.LENGTH_LONG, true).show();
+                            }
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
