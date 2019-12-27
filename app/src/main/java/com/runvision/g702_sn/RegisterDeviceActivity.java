@@ -79,7 +79,7 @@ public class RegisterDeviceActivity extends AppCompatActivity {
     private void initData() {
         etInscode.setText("3225974581615749");
         etTermtype.setText("1");
-        etVender.setText("山东济南");
+        etVender.setText("shandongjinan");
         etModel.setText("test0001");
         etGpsLon.setText("15");
         etGpsLat.setText("16");
@@ -116,16 +116,22 @@ public class RegisterDeviceActivity extends AppCompatActivity {
      */
     private void deviceRegister() {
         try {
+            String inscode = etInscode.getText().toString().trim();
+            String termtype = etTermtype.getText().toString().trim();
+            String vender = etVender.getText().toString().trim();
+            String model = etModel.getText().toString().trim();
             String gps = etGpsLon.getText().toString().trim() + "|" + etGpsLat.getText().toString().trim();
-//            String json_str = new Gson().toJson(new Device(
-//                    etInscode.getText().toString().trim(),
-//                    Integer.valueOf(etTermtype.getText().toString()),
-//                    etVender.getText().toString().trim(),
-//                    etModel.getText().toString().trim(),
-//                    gps,
-//                    etImei.getText().toString()));
+            String imei = etImei.getText().toString().trim();
+
+            String content_str = inscode + termtype + vender + model + gps + imei;
+            Log.i("lichao", "content_str:" + content_str);
+
+            String hmacSign = HMACSHA1.HmacSHA1Encrypt(content_str, "240a3b5707a2aceaba771dde8c32083d");
+            Log.e("lichao", "hmacSign:" + hmacSign);
 
             JSONObject jsonParam = new JSONObject();
+            jsonParam.put("usercode", "8520@201912");
+            jsonParam.put("hmaccode", hmacSign);
             jsonParam.put("inscode", etInscode.getText().toString().trim());//培训机构编号
             jsonParam.put("termtype", etTermtype.getText().toString());//计时终端类型
             jsonParam.put("vender", etVender.getText().toString());//计时终端类型
@@ -133,20 +139,12 @@ public class RegisterDeviceActivity extends AppCompatActivity {
             jsonParam.put("gps", gps);//计时终端类型
             jsonParam.put("imei", etImei.getText().toString());//计时终端类型
 
-            Log.i("lichao", "json_str:" + jsonParam.toString());
 
-            String hmacSign = HMACSHA1.HmacSHA1Encrypt(jsonParam.toString(), "240a3b5707a2aceaba771dde8c32083d");
-            Log.e("lichao", "hmacSign:" + hmacSign);
-
-            JSONObject hmac_json = new JSONObject();
-            //hmac_json.put("usercode", "8520@201912");
-            hmac_json.put("hmaccode", hmacSign);
-
-            Log.i("lichao", "hmac_json:" + hmac_json.toString());
+            Log.i("lichao", "jsonParam:" + jsonParam.toString());
 
             OkHttpUtils.postString()
                     .url(Const.REGISTER)
-                    .content(hmac_json.toString())
+                    .content(jsonParam.toString())
                     .mediaType(MediaType.parse("application/json; charset=utf-8"))
                     .build()
                     .execute(new StringCallback() {
@@ -166,7 +164,7 @@ public class RegisterDeviceActivity extends AppCompatActivity {
                                     SPUtil.putString(Const.PRIVATE_KEY, gsonData.getData().getPrivateKey());
                                     SPUtil.putString(Const.DEV_GPS, gps);
                                     SPUtil.putString(Const.DEV_NUM, gsonData.getData().getDevnum());
-                                    finish();
+                                    //finish();
                                     Toasty.success(mContext, getString(R.string.toast_register_success), Toast.LENGTH_SHORT, true).show();
                                 } else {
                                     Toasty.error(mContext, getString(R.string.toast_register_error_code) + gsonData.getErrorcode(), Toast.LENGTH_LONG, true).show();

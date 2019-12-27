@@ -225,7 +225,7 @@ public class Const {
     /**
      * 考勤终端注册接口
      */
-    public static String REGISTER =  SERVER_IP + "device/1.0?";
+    public static String REGISTER =  SERVER_IP + "device/1.0";
 
     /**
      * 考勤终端登录接口
